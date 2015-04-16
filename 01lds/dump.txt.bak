@@ -1,0 +1,109 @@
+
+target：     文件格式 elf32-i386
+target
+体系结构：i386， 标志 0x00000112：
+EXEC_P, HAS_SYMS, D_PAGED
+起始地址 0x00000000
+
+程序头：
+    LOAD off    0x00001000 vaddr 0x00000000 paddr 0x00000000 align 2**12
+         filesz 0x00000048 memsz 0x0000004c flags rwx
+   STACK off    0x00000000 vaddr 0x00000000 paddr 0x00000000 align 2**4
+         filesz 0x00000000 memsz 0x00000000 flags rw-
+
+节：
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000000a  00000000  00000000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .eh_frame     00000038  0000000c  0000000c  0000100c  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .data         00000004  00000044  00000044  00001044  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .bss          00000004  00000048  00000048  00001048  2**2
+                  ALLOC
+  4 .comment      00000024  00000000  00000000  00001048  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+0000000c l    d  .eh_frame	00000000 .eh_frame
+00000044 l    d  .data	00000000 .data
+00000048 l    d  .bss	00000000 .bss
+00000000 l    d  .comment	00000000 .comment
+00000000 l    df *ABS*	00000000 main.c
+00000048 g     O .bss	00000004 g_val_uinit
+00000044 g     O .data	00000004 g_val_init
+00000000 g     F .text	0000000a main
+
+
+
+Disassembly of section .text:
+
+00000000 <main>:
+   0:	55                   	push   %ebp
+   1:	89 e5                	mov    %esp,%ebp
+   3:	b8 00 00 00 00       	mov    $0x0,%eax
+   8:	5d                   	pop    %ebp
+   9:	c3                   	ret    
+
+Disassembly of section .eh_frame:
+
+0000000c <.eh_frame>:
+   c:	14 00                	adc    $0x0,%al
+   e:	00 00                	add    %al,(%eax)
+  10:	00 00                	add    %al,(%eax)
+  12:	00 00                	add    %al,(%eax)
+  14:	01 7a 52             	add    %edi,0x52(%edx)
+  17:	00 01                	add    %al,(%ecx)
+  19:	7c 08                	jl     23 <main+0x23>
+  1b:	01 1b                	add    %ebx,(%ebx)
+  1d:	0c 04                	or     $0x4,%al
+  1f:	04 88                	add    $0x88,%al
+  21:	01 00                	add    %eax,(%eax)
+  23:	00 1c 00             	add    %bl,(%eax,%eax,1)
+  26:	00 00                	add    %al,(%eax)
+  28:	1c 00                	sbb    $0x0,%al
+  2a:	00 00                	add    %al,(%eax)
+  2c:	d4 ff                	aam    $0xff
+  2e:	ff                   	(bad)  
+  2f:	ff 0a                	decl   (%edx)
+  31:	00 00                	add    %al,(%eax)
+  33:	00 00                	add    %al,(%eax)
+  35:	41                   	inc    %ecx
+  36:	0e                   	push   %cs
+  37:	08 85 02 42 0d 05    	or     %al,0x50d4202(%ebp)
+  3d:	46                   	inc    %esi
+  3e:	c5 0c 04             	lds    (%esp,%eax,1),%ecx
+  41:	04 00                	add    $0x0,%al
+  43:	00                   	.byte 0x0
+
+Disassembly of section .data:
+
+00000044 <g_val_init>:
+  44:	00 01                	add    %al,(%ecx)
+  46:	00 00                	add    %al,(%eax)
+
+Disassembly of section .bss:
+
+00000048 <g_val_uinit>:
+  48:	00 00                	add    %al,(%eax)
+  4a:	00 00                	add    %al,(%eax)
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	47                   	inc    %edi
+   1:	43                   	inc    %ebx
+   2:	43                   	inc    %ebx
+   3:	3a 20                	cmp    (%eax),%ah
+   5:	28 55 62             	sub    %dl,0x62(%ebp)
+   8:	75 6e                	jne    78 <g_val_uinit+0x30>
+   a:	74 75                	je     81 <g_val_uinit+0x39>
+   c:	20 34 2e             	and    %dh,(%esi,%ebp,1)
+   f:	39 2e                	cmp    %ebp,(%esi)
+  11:	31 2d 31 36 75 62    	xor    %ebp,0x62753631
+  17:	75 6e                	jne    87 <g_val_uinit+0x3f>
+  19:	74 75                	je     90 <g_val_uinit+0x48>
+  1b:	36 29 20             	sub    %esp,%ss:(%eax)
+  1e:	34 2e                	xor    $0x2e,%al
+  20:	39 2e                	cmp    %ebp,(%esi)
+  22:	31 00                	xor    %eax,(%eax)
