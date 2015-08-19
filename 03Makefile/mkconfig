@@ -1,0 +1,25 @@
+#!/bin/sh -e
+BOARD_NAME=""
+echo "file path:"$0
+echo $$
+echo "\$@:"$@
+echo "\$1:"$1
+echo "\$#:"$#
+echo "ARCH = $1" > config.mk
+[ "${BOARD_NAME}" ] || BOARD_NAME="$1"
+#BOARD_NAME="$1"
+echo "${BOARD_NAME}"
+[ $# -gt 6 ] && exit 1
+echo "while start========================"
+while [ $# -gt 0 ] ; do
+	case "$1" in
+	smdk2400)	shift ; echo "smdk2400" break ;;
+	arm) 		shift ; echo "arm" break ;;
+	arm920t) 	shift ; echo "arm920t" break ;;
+	smdk2400) 	shift ; echo "smdk2400" break ;;
+	samsung) 	shift ; echo "samsung" break ;;
+	s3c24x0) 	shift ; echo "s3c24x0" break ;;
+	*) shift ; echo "default" break;;
+	esac
+done
+echo "while end========================"
