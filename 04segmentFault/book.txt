@@ -1,0 +1,106 @@
+用gdb查看内存:
+格式: x /nfu
+说明
+x 是 examine 的缩写
+n表示要显示的内存单元的个数
+f表示显示方式, 可取如下值
+x 按十六进制格式显示变量。
+d 按十进制格式显示变量。
+u 按十进制格式显示无符号整型。
+o 按八进制格式显示变量。
+t 按二进制格式显示变量。
+a 按十六进制格式显示变量。
+i 指令地址格式
+c 按字符格式显示变量。
+f 按浮点数格式显示变量。
+u表示一个地址单元的长度
+b表示单字节，
+h表示双字节，
+w表示四字节，
+g表示八字节
+Format letters are o(octal), x(hex), d(decimal), u(unsigned decimal),
+t(binary), f(float), a(address), i(instruction), c(char) and s(string).
+Size letters are b(byte), h(halfword), w(word), g(giant, 8 bytes)
+举例
+x/3uh buf
+表示从内存地址buf读取内容，
+h表示以双字节为一个单位，
+3表示三个单位，
+u表示按十六进制显示
+例子：
+n是个局部变量
+Breakpoint 1, main (argc=1, argv=0xbffff3a4) at calc.c:7
+7        int n = atoi(argv[1]);
+(gdb) print &n
+$1 = (int *) 0xbffff2ec
+(gdb) x 0xbffff2ec
+0xbffff2ec:    0x00282ff4
+(gdb) print * (int *) 0xbffff2ec
+$2 = 2633716
+(gdb) x /4xw 0xbffff2ec
+0xbffff2ec:    0x00282ff4    0x080484e0    0x00000000    0xbffff378
+(gdb) x /4dw 0xbffff2ec
+0xbffff2ec:    2633716    134513888    0    -1073745032
+(gdb)
+
+
+watch的使用:
+watch通常需要和break，run，continue联合使用。
+下面举例说明：
+代码如下：
+    #include <stdio.h>        
+    int main()  
+    {  
+        int a=0;  
+        for(int i=0; i<10; i++)  
+            a+=i;  
+    }  
+
+调试的时候过程如下：
+(gdb) l
+1    #include <stdio.h>
+2    
+3    int main()
+4    {
+5        int a=0;
+6        for(int i=0; i<10; i++)
+7            a+=i;
+8    }
+(gdb) b 5                    -------在第5行设置断电
+Breakpoint 1 at 0x80483ba: file a.cpp, line 5.
+(gdb) r                       -------执行到断点处停止
+Starting program: /a.o 
+
+Breakpoint 1, main () at a.cpp:5
+5        int a=0;
+(gdb) watch a               -------观察a的值，当有变化时，停止
+Hardware watchpoint 2: a
+(gdb) c                        -------继续执行，当a的值变化时停止
+Continuing.
+Hardware watchpoint 2: a
+
+Old value = 0
+New value = 1
+main () at a.cpp:6
+
+
+查看数组的值:
+有时候，你需要查看一段连续的内存空间的值。比如数组的一段，或是动态分配的数据的大小。你可以使用GDB的“@”操
+作符，“@”的左边是第一个内存的地址的值，“@”的右边则你你想查看内存的长度。例如，你的程序中有这样的语句：
+int *array = (int *) malloc (len * sizeof (int));
+于是，在GDB调试过程中，你可以以如下命令显示出这个动态数组的取值：
+p *array@len
+
+查看局部变量:
+info local
+
+GDB堆栈跟踪的方法:
+程序“调用堆栈”是当前函数之前的所有已调用函数的列表（包括当前函数）。每个函数及其变量都被分配了一个“帧”，最近调用的函数在 0 号帧中（“底部”帧）。要打印堆栈，发出命令 'bt'（'backtrace' [回溯] 的缩写）： (gdb) bt 
+#0  0x80483ea in wib (no1=8, no2=8) at eg1.c:7 
+#1  0x8048435 in main (argc=1, argv=0xbffff9c4) at eg1.c:21 
+此结果显示了在 main() 的第 21 行中调用了函数 wib()（只要使用 'list 21' 就能证实这一点），而且 wib() 在 0 号帧中，main() 在 1 号帧中。由于 wib() 在 0 号帧中，那么它就是执行程序时发生算术错误的函数。 
+实际上，发出 'info locals' 命令时，gdb 会打印出当前帧中的局部变量，缺省情况下，这个帧中的函数就是被中断的函数（0 号帧）。可以使用命令 'frame' 打印当前帧。要查看 main 函数（在 1 号帧中）中的变量，可以发出 'frame 1' 切换到 1 号帧，然后发出 'info locals' 命令： (gdb) frame 1 
+#1  0x8048435 in main (argc=1, argv=0xbffff9c4) at eg1.c:21 21          result = wib(value, div); (gdb) info locals value = 8 div = 8 result = 4 i = 2 total = 6     
+此信息显示了在第三次执行 "for" 循环时（i 等于 2）发生了错误，此时 "value" 等于 "div"。 
+可以通过如上所示在 'frame' 命令中明确指定号码，或者使用 'up' 命令在堆栈中上移以及 'down' 命令在堆栈中下移来切换帧。要获取有关帧的进一步信息，如它的地址和程序语言，可以使用命令 'info frame'。 
+gdb 堆栈命令可以在程序执行期间使用，也可以在 core 文件中使用，因此对于复杂的程序，可以在程序运行时跟踪它是如何转到函数的。 
