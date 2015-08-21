@@ -28,7 +28,7 @@ int main(void)
 	printf("%d\n", __LINE__);
 	*ptr = 8;
 	func1(1);
-	ptr = NULL;
+//	ptr = NULL;
 	*ptr = 7;
 	i = 0;
 	i = 1;
