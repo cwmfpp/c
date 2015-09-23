@@ -12,6 +12,5 @@ do
 	iptables -A OUTPUT -d $line -j ACCEPT
 	iptables -A FORWARD -s $line -j ACCEPT
 	iptables -A FORWARD -d $line -j ACCEPT
-	echo $line
-done < ip.txt 
+done < ip_list.txt 
 
